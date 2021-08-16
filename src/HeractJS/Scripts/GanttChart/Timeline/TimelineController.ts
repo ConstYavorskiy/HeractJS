@@ -172,7 +172,7 @@ export class TaskLineView extends React.Component<any, any> {
             return React.createElement(TasklineTimeItem, {
                 key: itemData.id,
                 data: itemData
-            } as React.DOMAttributes);
+            } as React.DOMAttributes<Element>);
         });
         const tasklineBars = this.state.tasklineTasks.map((timeLineItem: any) => {
             const itemData = objectConstuctor.assign({}, timeLineItem)
@@ -180,7 +180,7 @@ export class TaskLineView extends React.Component<any, any> {
             return React.createElement(TasklineBar, {
                 key: itemData.id,
                 data: itemData
-            } as React.DOMAttributes);
+            } as React.DOMAttributes<Element>);
         });
         const tasklineMilestones = this.state.tasklineMilestones.map((timeLineItem: any) => {
             const itemData = objectConstuctor.assign({}, timeLineItem)
@@ -188,7 +188,7 @@ export class TaskLineView extends React.Component<any, any> {
             return React.createElement(TasklineMilestone, {
                 key: itemData.id,
                 data: itemData
-            } as React.DOMAttributes);
+            } as React.DOMAttributes<Element>);
         });
         const tasklineCallouts = this.state.tasklineCallouts.map((timeLineItem: any) => {
             const itemData = objectConstuctor.assign({}, timeLineItem)
@@ -196,29 +196,29 @@ export class TaskLineView extends React.Component<any, any> {
             return React.createElement(TasklineCallouts, {
                 key: itemData.id,
                 data: itemData
-            } as React.DOMAttributes);
+            } as React.DOMAttributes<Element>);
         });
         return React.createElement('div', {
             id: 'tasklineContainer',
             className: 'tasklineContainer',
             onMouseDown: this.startPanning.bind(this),
             onWheel: this.startScrolling.bind(this)
-        } as React.DOMAttributes,
+        } as React.DOMAttributes<Element>,
             React.createElement('svg', {
                 className: 'taskLineCallouts',
                 id: 'taskLineCallouts'
-            } as React.DOMAttributes, tasklineCallouts),
+            } as React.DOMAttributes<Element>, tasklineCallouts),
             React.createElement('svg', {
                 className: 'tasklineTimeline',
                 id: 'tasklineTimeline'
-            } as React.DOMAttributes, tasklineTimeline),
+            } as React.DOMAttributes<Element>, tasklineTimeline),
             React.createElement('svg', {
                 className: 'tasklineBars',
                 id: 'tasklineBars'
-            } as React.DOMAttributes, tasklineBars),
+            } as React.DOMAttributes<Element>, tasklineBars),
             React.createElement('svg', {
                 className: 'tasklineMilestones',
                 id: 'tasklineMilestones'
-            } as React.DOMAttributes, tasklineMilestones));
+            } as React.DOMAttributes<Element>, tasklineMilestones));
     }
 };

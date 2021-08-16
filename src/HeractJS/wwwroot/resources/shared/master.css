@@ -2759,6 +2759,16 @@ div.cmw-input {
 
 /* /h1-h6 */
 
+.wrapper {
+    display: flex;
+}
+
+.wrapper__content {
+    display: flex;
+    min-width: 0;
+    overflow: auto;
+}
+
 /*------------------------------ icon-toggle -----------------------------*/
 .icon-toggle {
     width: 6px;

@@ -9,19 +9,19 @@
  *       actual or intended publication of such source code.
  */
 
-import shared from 'modules/shared';
-import EventCenterService from 'services/EventCenterService';
-import Notifications from 'modules/notifications';
+import ContentViewBehavior from '../../shared/application/views/behaviors/ContentViewBehavior';
+// import EventCenterService from '../../shared/services/EventCenterService.js';
+// import Notifications from 'modules/notifications';
 import template from '../templates/content.html';
-import SelectableCollection from 'modules/shared/collections/SelectableCollection';
-import RoutingService from 'services/RoutingService';
+import SelectableCollection from '../../shared/application/collections/SelectableCollection';
+import RoutingService from '../../shared/services/RoutingService';
 
 const classes = {
     TABS_CONTAINER_WITH_BACK: 'top-nav-back'
 };
-
-const NotificationsButtonView = Notifications.NotificationsButtonView;
-const NotificationsPanelView = Notifications.NotificationsPanelView;
+//
+// const NotificationsButtonView = Notifications.NotificationsButtonView;
+// const NotificationsPanelView = Notifications.NotificationsPanelView;
 
 export default Marionette.LayoutView.extend({
     initialize() {
@@ -63,7 +63,7 @@ export default Marionette.LayoutView.extend({
 
     behaviors: {
         ContentViewBehavior: {
-            behaviorClass: shared.application.views.behaviors.ContentViewBehavior,
+            behaviorClass: ContentViewBehavior,
             profileRegion: 'profileRegion',
             moduleLoadingRegion: 'moduleLoadingRegion'
         }
@@ -77,12 +77,12 @@ export default Marionette.LayoutView.extend({
     },
 
     onShow() {
-        this.notificationsRegion.show(Core.dropdown.factory.createPopout({
-            customAnchor: true,
-            buttonView: NotificationsButtonView,
-            panelView: NotificationsPanelView
-        }));
-        this.eventCenterRegion.show(EventCenterService.getEventCenterView());
+        // this.notificationsRegion.show(Core.dropdown.factory.createPopout({
+        //     customAnchor: true,
+        //     buttonView: NotificationsButtonView,
+        //     panelView: NotificationsPanelView
+        // }));
+        // this.eventCenterRegion.show(EventCenterService.getEventCenterView());
     },
 
     setHeaderTabs(tabs, currentTabId) {

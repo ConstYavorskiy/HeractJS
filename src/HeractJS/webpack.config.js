@@ -1,7 +1,7 @@
 ﻿var path = require('path');
 const webpack = require('webpack');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
+// var CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin');
 var LimitChunkCountPlugin = require('webpack/lib/optimize/LimitChunkCountPlugin');
 var AggressiveMergingPlugin = require('webpack/lib/optimize/AggressiveMergingPlugin');
 const autoprefixer = require('autoprefixer');
@@ -16,7 +16,8 @@ module.exports = {
         path: path.resolve(__dirname + '/wwwroot/js/'),
         filename: 'cmw.tracker.[name].bundle.js',
         chunkFilename: "[id].chunk.js",
-        publicPath: path.resolve(__dirname + '/wwwroot/js/')
+        publicPath: path.resolve(__dirname + '/wwwroot/js/'),
+        globalObject: 'this'
     },
     resolve: {
         modules: [
@@ -26,8 +27,8 @@ module.exports = {
         ],
         extensions: ['.Webpack.js', '.web.js', '.ts', '.js', '.tsx'],
         alias: {
-            coreui: path.resolve(__dirname + '/node_modules/comindware.core.ui/dist/core.bundle.js'),
-            'comindware/core': path.resolve(__dirname + '/node_modules/comindware.core.ui/dist/core.bundle.js'),
+            coreui: path.resolve(__dirname + '/node_modules/comindware.core.ui/dist/core.js'),
+            'comindware/core': path.resolve(__dirname + '/node_modules/comindware.core.ui/dist/core.js'),
             rootpath: path.resolve(__dirname + '/scripts/project'),
             recourcePath: path.resolve(__dirname + '/wwwroot/resources'),
             sharedpath: path.resolve(__dirname + '/scripts/project/shared'),
@@ -52,7 +53,8 @@ module.exports = {
         rules: [{
             test: /\.tsx?$/,
             exclude: /(node_modules|bower_components)/,
-            loader: 'ts-loader'
+            loader: 'ts-loader',
+            options: {}
         }, {
             test: /\.hbs$/,
             loader: "handlebars-loader"
@@ -64,50 +66,44 @@ module.exports = {
             loader: "text-loader"
         }, {
             test: /\.css$/,
-            use: ExtractTextPlugin.extract({
-                fallback: 'style-loader',
-                use: [{
-                    loader: 'css-loader'
-                }, {
-                    loader: 'postcss-loader',
+            use: [
+                MiniCssExtractPlugin.loader,
+                {
+                    loader: 'css-loader',
                     options: {
                         sourceMap: true,
-                        plugins: () => {
-                            const plugins = [
-                                autoprefixer({
-                                    browsers: ['last 2 versions']
-                                })];
-                            plugins.push(cssnano({
-                                preset: ['default', {
-                                    discardComments: {
-                                        removeAll: true
-                                    }
-                                }]
-                            }));
-                            return plugins;
-                        }
+                        importLoaders: 1,
+                        import: true
                     }
-                }]
-            })
+                },
+                {
+                    loader: 'postcss-loader',
+                    options: {
+                        ident: 'postcss',
+                        sourceMap: true,
+                        plugins: () => [autoprefixer()]
+                    }
+                }
+            ]
         }, {
             test: /\.js$/,
             loader: 'babel-loader',
-            exclude: [
-                "node_modules"
-            ],
+            exclude: /node_modules/,
             options: {
-                presets: ['latest']
+                presets:  [ "es2015"]
             }
         }]
     },
     plugins: [
-        new CommonsChunkPlugin({ name: 'commons', filename: 'commons.js' }),
+        // new CommonsChunkPlugin({ name: 'commons', filename: 'commons.js' }),
         new LimitChunkCountPlugin({ maxChunks: 1 }),
         new AggressiveMergingPlugin({
             minSizeReduce: 1.5,
             moveToParents: true
         }),
-        new ExtractTextPlugin('bundle.css'),
+        new MiniCssExtractPlugin({
+            filename: 'bundle.css'
+        }),
         new webpack.NoEmitOnErrorsPlugin(),
         new webpack.optimize.ModuleConcatenationPlugin()
         //new webpack.optimize.DedupePlugin(),

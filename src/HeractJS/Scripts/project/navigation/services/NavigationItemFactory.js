@@ -77,7 +77,7 @@ define([
                 case systemTypes.RECORD_TYPE:
                     return this.__createRecordTypeModel(attributes);
                 default:
-                    core.utils.helpers.throwFormatError('Invalid systemType.');
+                    return this.__createSystemModel(attributes);
                 }
             },
 
@@ -88,7 +88,7 @@ define([
                 case 'recordType':
                     return RecordTypeNavigationItemView;
                 default:
-                    core.utils.helpers.throwFormatError('Invalid navigation item type.');
+                    DefaultNavigationItemView
                 }
             },
 

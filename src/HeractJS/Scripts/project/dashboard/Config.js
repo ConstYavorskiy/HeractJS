@@ -1,4 +1,4 @@
-﻿define(['dashboardInitializer'], function (dashboardInitializer) {
+﻿define(['./Initializer'], function (dashboardInitializer) {
 
     return {
         id: 'module:dashboard',

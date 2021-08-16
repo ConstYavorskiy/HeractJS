@@ -9,144 +9,141 @@
  *       actual or intended publication of such source code.
  */
 
-/* global define, require, _, $, Context */
+import core from 'comindware.core.ui/dist/core';
+import backboneForm from 'backbone-forms';
+import en from 'LANGMAPEN';
+import moduleConfigs from 'rootpath/moduleConfigs';
+import shared from 'shared';
+import navigation from 'navigation';
+import navigationContext from 'rootpath/NavigationContext';
+import currentUserModel from 'rootpath/CurrentUserModel';
+import stylesConfig from 'rootpath/StylesConfig';
+import { AppMediator } from 'appMediator';
 
-define([
-    'LANGMAPEN',
-    'coreui', 'shared',
-    'rootpath/moduleConfigs',
-    'navigation', 'rootpath/NavigationContext',
-    'rootpath/CurrentUserModel',
-    'rootpath/StylesConfig',
-    'appMediator'
-    ],
-    function (en, core, shared, moduleConfigs, navigation, navigationContext, currentUserModel, stylesConfig, appMediator) {
-    'use strict';
+window.Context = {};
+window.ajaxMap = [];
+window.flag_debug = true;
+window.langCode = 'en';
 
-    window.Context = {};
-    window.ajaxMap = [];
-    window.flag_debug = true;
-    window.langCode = 'en';
+Localizer.initialize({
+    langCode: 'en',
+    localizationMap: window['LANGMAPEN'],
+    warningAsError: !!window.Context.compiled
+});
 
-    Localizer.initialize({
-        langCode: 'en',
-        localizationMap: window['LANGMAPEN'],
-        warningAsError: !!window.Context.compiled
-    });
+var App = new Marionette.Application();
 
-    var App = new Marionette.Application();
+App.addRegions({
+    navigationRegion: ".js-navigation-region",
+    contentRegion: ".js-content-region",
+    contentLoadingRegion: ".js-content-loading-region",
+    fadingRegion: ".js-fading-region",
+    popupRegion: ".js-popup-region",
+    toastNotificationRegion: ".js-toast-notification-region"
+});
 
-    App.addRegions({
-        navigationRegion: ".js-navigation-region",
-        contentRegion: ".js-content-region",
-        contentLoadingRegion: ".js-content-loading-region",
-        fadingRegion: ".js-fading-region",
-        popupRegion: ".js-popup-region",
-        toastNotificationRegion: ".js-toast-notification-region"
-    });
+App.ui = {
+    contentContainer: $('.js-content-container'),
+    navigationContainer: $('.js-navigation-container'),
+    fadingRegion: $('.js-fading-region'),
+    popupRegion: $('.js-popup-region'),
+    toastNotificationRegion: $('.js-toast-notification-region')
+};
 
-    App.ui = {
-        contentContainer: $('.js-content-container'),
-        navigationContainer: $('.js-navigation-container'),
-        fadingRegion: $('.js-fading-region'),
-        popupRegion: $('.js-popup-region'),
-        toastNotificationRegion: $('.js-toast-notification-region')
-    };
-
-    var appModuleConfigs = _.flatten([moduleConfigs]);
-    App.registerAppModule = function (moduleConfig) {
-        if (!moduleConfig) {
-            core.utils.helpers.throwArgumentError();
-        }
-        appModuleConfigs.push(moduleConfig);
-    };
-
-    var userDefinedNavigationItems = [];
-    App.registerNavigationItem = function (item) {
-        if (!item) {
-            core.utils.helpers.throwArgumentError();
-        }
-        userDefinedNavigationItems.push(item);
-    };
-
-    function configure() {
-        var langCode = Context.langCode = 'EN';
-        // DateTimePicker
-        if (!$.fn.datetimepicker.dates[langCode]) {
-            $.fn.datetimepicker.dates[langCode] = {
-                days: Localizer.get('CORE.FORMATS.DATETIME.DAYSFULL').split(','), //["Sunday", "Monday", ... ]
-                daysShort: Localizer.get('CORE.FORMATS.DATETIME.DAYSSHORT').split(','), //["Sun", "Mon", ... ],
-                daysMin: Localizer.get('CORE.FORMATS.DATETIME.DAYSSHORT').split(','),
-                months: Localizer.get('CORE.FORMATS.DATETIME.MONTHS').split(','), //["January", "February", ... ]
-                monthsShort: Localizer.get('CORE.FORMATS.DATETIME.MONTHSSHORT').split(','), //["Jan", "Feb", ... ]
-                today: Localizer.get('CORE.FORMATS.DATETIME.TODAY'),
-                meridiem: Localizer.get('CORE.FORMATS.DATETIME.MERIDIEM').split(',')
-            };
-        }
+var appModuleConfigs = _.flatten([moduleConfigs]);
+App.registerAppModule = function (moduleConfig) {
+    if (!moduleConfig) {
+        core.utils.helpers.throwArgumentError();
     }
-    App.addInitializer(function () {
-        // Module service
-        App.currentUser = new currentUserModel(JSON.parse('{"UserId":"account.1","UserName":"admin","UserAbbreviation":"ad","UserLogin":"admin","PersonalContainer":"account.1_tasks","Language":"EN","NeedTrialInfo":false,"TutorialCompletedSteps":0,"TutorialDismissed":false,"IsAdmin":true,"IsManager":false,"IsResourcePoolManager":false,"IsSystemAdmin":false,"HasSubordinates":false}'));
-        shared.services.ModuleService.initialize({
-            modules: appModuleConfigs
-        });
-        App.navigationController = new navigation.Controller({
-            context: navigationContext,
-            predefinedItems: userDefinedNavigationItems
-        });
-        // Routing service loads and initializes all the application routes and modules
-        shared.services.RoutingService.initialize({
-            defaultUrl: App.navigationController.getDefaultUrl(),
-            modules: appModuleConfigs
-        });
-        shared.services.SecurityService.initialize({
-            // userPermissions: Context.configurationModel.GlobalPermissions
-        });
+    appModuleConfigs.push(moduleConfig);
+};
 
-        core.initialize({
-            cacheService: shared.services.CacheService,
-            ajaxService: {
-                ajaxMap: window.ajaxMap
-            },
-            localizationService: {
-                langCode: 'en',
-                localizationMap: window.LANGMAPEN,
-                warningAsError: false //window.compiled
-            },
-            windowService: {
-                fadingRegion: App.fadingRegion,
-                popupRegion: App.popupRegion,
-                ui: App.ui
-            },
-            userService: {
-                dataProvider: {
-                    listUsers: function () {
-                        return shared.services.CacheService.GetUsers().map(function (user) {
-                            return {
-                                id: user.Id,
-                                name: user.FullName || user.Text || '',
-                                userName: user.Username || '',
-                                abbreviation: user.Abbreviation || '',
-                                avatarUrl: user.UserpicUri,
-                                url: user.link
-                            };
-                        });
-                    }
+var userDefinedNavigationItems = [];
+App.registerNavigationItem = function (item) {
+    if (!item) {
+        core.utils.helpers.throwArgumentError();
+    }
+    userDefinedNavigationItems.push(item);
+};
+
+function configure() {
+    var langCode = Context.langCode = 'EN';
+    // DateTimePicker
+    if (!$.fn.datetimepicker.dates[langCode]) {
+        $.fn.datetimepicker.dates[langCode] = {
+            days: Localizer.get('CORE.FORMATS.DATETIME.DAYSFULL').split(','), //["Sunday", "Monday", ... ]
+            daysShort: Localizer.get('CORE.FORMATS.DATETIME.DAYSSHORT').split(','), //["Sun", "Mon", ... ],
+            daysMin: Localizer.get('CORE.FORMATS.DATETIME.DAYSSHORT').split(','),
+            months: Localizer.get('CORE.FORMATS.DATETIME.MONTHS').split(','), //["January", "February", ... ]
+            monthsShort: Localizer.get('CORE.FORMATS.DATETIME.MONTHSSHORT').split(','), //["Jan", "Feb", ... ]
+            today: Localizer.get('CORE.FORMATS.DATETIME.TODAY'),
+            meridiem: Localizer.get('CORE.FORMATS.DATETIME.MERIDIEM').split(',')
+        };
+    }
+}
+
+App.addInitializer(function () {
+    // Module service
+    App.currentUser = new currentUserModel(JSON.parse('{"UserId":"account.1","UserName":"admin","UserAbbreviation":"ad","UserLogin":"admin","PersonalContainer":"account.1_tasks","Language":"EN","NeedTrialInfo":false,"TutorialCompletedSteps":0,"TutorialDismissed":false,"IsAdmin":true,"IsManager":false,"IsResourcePoolManager":false,"IsSystemAdmin":false,"HasSubordinates":false}'));
+    shared.services.ModuleService.initialize({
+        modules: appModuleConfigs
+    });
+    App.navigationController = new navigation.Controller({
+        context: navigationContext,
+        predefinedItems: userDefinedNavigationItems
+    });
+    // Routing service loads and initializes all the application routes and modules
+    shared.services.RoutingService.initialize({
+        defaultUrl: App.navigationController.getDefaultUrl(),
+        modules: appModuleConfigs
+    });
+    shared.services.SecurityService.initialize({
+        // userPermissions: Context.configurationModel.GlobalPermissions
+    });
+
+    core.initialize({
+        cacheService: shared.services.CacheService,
+        ajaxService: {
+            ajaxMap: window.ajaxMap
+        },
+        localizationService: {
+            langCode: 'en',
+            localizationMap: window.LANGMAPEN,
+            warningAsError: false //window.compiled
+        },
+        windowService: {
+            fadingRegion: App.fadingRegion,
+            popupRegion: App.popupRegion,
+            ui: App.ui
+        },
+        userService: {
+            dataProvider: {
+                listUsers: function () {
+                    return shared.services.CacheService.GetUsers().map(function (user) {
+                        return {
+                            id: user.Id,
+                            name: user.FullName || user.Text || '',
+                            userName: user.Username || '',
+                            abbreviation: user.Abbreviation || '',
+                            avatarUrl: user.UserpicUri,
+                            url: user.link
+                        };
+                    });
                 }
             }
-        });
-
-        // After that we show left navigation
-        App.navigationRegion.show(App.navigationController.view);
-
-        // And remove startup loading element
-        $('.js-startup-loading').remove();
+        }
     });
 
-    //initialize application mediator
-    App.appMediator = appMediator.AppMediator.getInstance();
+    // After that we show left navigation
+    App.navigationRegion.show(App.navigationController.view);
 
-    window.application = App;
-
-    App.start();
+    // And remove startup loading element
+    $('.js-startup-loading').remove();
 });
+
+//initialize application mediator
+App.appMediator = AppMediator.getInstance();
+
+window.application = App;
+
+App.start();

@@ -9,13 +9,13 @@
  *       actual or intended publication of such source code.
  */
 
-import shared from 'modules/shared';
-import WindowTitleService from 'services/WindowTitleService';
+import Module from '../shared/application/Module';
+// import WindowTitleService from './services/WindowTitleService';
 import ContentView from './views/ContentView';
 
-export default shared.application.Module.extend({
+export default Module.extend({
     contentView: ContentView,
-    
+
     onRoute(containerId) {
         return recordTypeModel.fetch().then(() => {
             this.getTopNavigationItems(containerId)
@@ -30,6 +30,6 @@ export default shared.application.Module.extend({
     },
 
     __updateWindowTitle() {
-        WindowTitleService.setTitle(this.recordTypeModel ? this.recordTypeModel.get('name') : null, this.datasetModel ? this.datasetModel.get('name') : null);
+        // WindowTitleService.setTitle(this.recordTypeModel ? this.recordTypeModel.get('name') : null, this.datasetModel ? this.datasetModel.get('name') : null);
     }
 });

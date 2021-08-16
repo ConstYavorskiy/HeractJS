@@ -33,4 +33,3 @@
         template: Handlebars.compile(template),
     })
 })
-            

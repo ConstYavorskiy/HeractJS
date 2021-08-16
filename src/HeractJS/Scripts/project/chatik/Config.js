@@ -9,7 +9,7 @@
  *       actual or intended publication of such source code.
  */
 
-import Initializer from 'Initializer';
+import Initializer from './Initilaizer';
 
 export default {
     id: 'chatik',

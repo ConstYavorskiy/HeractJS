@@ -82,19 +82,19 @@ var _ = _self.Prism = {
 		insertBefore: function (inside, before, insert, root) {
 			root = root || _.languages;
 			var grammar = root[inside];
-			
+
 			if (arguments.length == 2) {
 				insert = arguments[1];
-				
+
 				for (var newToken in insert) {
 					if (insert.hasOwnProperty(newToken)) {
 						grammar[newToken] = insert[newToken];
 					}
 				}
-				
+
 				return grammar;
 			}
-			
+
 			var ret = {};
 
 			for (var token in grammar) {
@@ -114,7 +114,7 @@ var _ = _self.Prism = {
 					ret[token] = grammar[token];
 				}
 			}
-			
+
 			// Update references in other language definitions
 			_.languages.DFS(_.languages, function(key, value) {
 				if (value === root[inside] && key != inside) {
@@ -503,7 +503,7 @@ if (Prism.languages.markup) {
 			alias: 'language-css'
 		}
 	});
-	
+
 	Prism.languages.insertBefore('inside', 'attr-value', {
 		'style-attr': {
 			pattern: /\s*style=("|').*?\1/i,
@@ -612,22 +612,22 @@ function hasClass(element, className) {
   return (" " + element.className + " ").replace(/[\n\t]/g, " ").indexOf(className) > -1
 }
 
-var CRLF = crlf = /\r?\n|\r/g;
-    
+var CRLF = /\r?\n|\r/g;
+
 function highlightLines(pre, lines, classes) {
 	var ranges = lines.replace(/\s+/g, '').split(','),
 	    offset = +pre.getAttribute('data-line-offset') || 0;
-	
+
 	var lineHeight = parseFloat(getComputedStyle(pre).lineHeight);
 
 	for (var i=0, range; range = ranges[i++];) {
 		range = range.split('-');
-					
+
 		var start = +range[0],
 		    end = +range[1] || start;
-		
+
 		var line = document.createElement('div');
-		
+
 		line.textContent = Array(end - start + 2).join(' \n');
 		line.className = (classes || '') + ' line-highlight';
 
@@ -654,25 +654,25 @@ function highlightLines(pre, lines, classes) {
 
 function applyHash() {
 	var hash = location.hash.slice(1);
-	
+
 	// Remove pre-existing temporary lines
 	$$('.temporary.line-highlight').forEach(function (line) {
 		line.parentNode.removeChild(line);
 	});
-	
+
 	var range = (hash.match(/\.([\d,-]+)$/) || [,''])[1];
-	
+
 	if (!range || document.getElementById(hash)) {
 		return;
 	}
-	
+
 	var id = hash.slice(0, hash.lastIndexOf('.')),
 	    pre = document.getElementById(id);
-	    
+
 	if (!pre) {
 		return;
 	}
-	
+
 	if (!pre.hasAttribute('data-line')) {
 		pre.setAttribute('data-line', '');
 	}
@@ -687,19 +687,19 @@ var fakeTimer = 0; // Hack to limit the number of times applyHash() runs
 Prism.hooks.add('after-highlight', function(env) {
 	var pre = env.element.parentNode;
 	var lines = pre && pre.getAttribute('data-line');
-	
+
 	if (!pre || !lines || !/pre/i.test(pre.nodeName)) {
 		return;
 	}
-	
+
 	clearTimeout(fakeTimer);
-	
+
 	$$('.line-highlight', pre).forEach(function (line) {
 		line.parentNode.removeChild(line);
 	});
-	
+
 	highlightLines(pre, lines);
-	
+
 	fakeTimer = setTimeout(applyHash, 1);
 });
 
